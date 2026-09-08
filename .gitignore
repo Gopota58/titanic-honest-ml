@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.log
+.ipynb_checkpoints/
+.DS_Store
+sweep100_preds.npz
