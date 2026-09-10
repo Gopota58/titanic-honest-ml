@@ -24,6 +24,17 @@
 
 Полная таблица всех посылок и грабли — в `submissions/` и в описании проекта (LoreBase).
 
+### Кампания 2026-09-10: честная попытка пробить 0.81100
+
+Потрачено **10 посылок** (9 экспериментальных + 1 резерв): добавление фич (`title`/`deck`/
+`titledeck`), 4-е семейные ключи (`cabin_letter`/`ticket_prefix`), RF+ET mixed, seed-bagging,
+подстройка `leaf`, двухуровневый стек. Подробный отчёт — в [`docs/campaign.md`](docs/campaign.md).
+
+**Итог:** рекорд **0.81100 подтверждён как жёсткий честный потолок**. 6/9 экспериментов тирятся
+с C2 (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи). Bagging и `leaf=20`
+**ухудшили** результат (0.80622) — рекорд держится одной удачной конфигурацией (seed=0, leaf=10):
+это **хрупкий пик**. Дальнейший честный прирост невозможен (выше — только утечка/LB-probing/фейк).
+
 ## Методология
 
 Единственный сигнал, честно обобщающийся на тест, — **сглаженный OOF target-encoding
@@ -73,6 +84,7 @@ titanic-honest-ml/
 │   ├── robust_rf2.csv           # 0.80382
 │   ├── cand_3keycvw.csv         # 0.81100  ← ФИНАЛ (активная)
 │   ├── cand_title.csv, cand_deck.csv, sweep_winner.csv
+│   ├── camp_E1..E9.csv          # артефакты кампании 2026-09-10 (9+1 честных посылок)
 ├── requirements.txt
 └── README.md
 ```
@@ -95,6 +107,16 @@ python src/gen_next6.py            # -> cand_3keycvw.csv (0.81100)
 # Отправка на Kaggle (требует KAGGLE_USERNAME / KAGGLE_KEY):
 python -m kaggle competitions submit -c titanic -f submissions/cand_3keycvw.csv -m "RF 3-key cvw blend, public LB 0.81100"
 ```
+
+## Примеры
+
+- [`examples/c2_minimal.py`](examples/c2_minimal.py) — минимальный, разобранный построчно
+  пример воспроизведения рекордной посылки C2 (0.81100): OOF family-survival (α=10) по трём
+  семейным ключам + RandomForest + cv-взвешивание. Генерирует `submissions/c2_minimal.csv`.
+- [`docs/campaign.md`](docs/campaign.md) — полный отчёт по кампании 2026-09-10 (9+1 посылок):
+  гипотезы, таблица реальных LB-скоров, выводы о честном потолке 0.81100.
+- [`submissions/`](submissions/) — 6 ключевых посылок проекта + копии артефактов кампании
+  (`camp_E1..E9.csv`), доказывающие результат на реальном Kaggle LB.
 
 ## Disclaimer
 
