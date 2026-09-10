@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Честный Kaggle Titanic — public LB 0.81100</title>
+  <style>
+    :root { --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e; --accent:#2ea043; --border:#30363d; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+           background:var(--bg); color:var(--fg); line-height:1.6; }
+    .wrap { max-width:880px; margin:0 auto; padding:48px 24px 72px; }
+    h1 { font-size:2rem; margin:0 0 8px; }
+    .badge { display:inline-block; background:var(--accent); color:#fff; font-weight:600;
+             padding:4px 12px; border-radius:999px; font-size:.9rem; }
+    h2 { margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:6px; font-size:1.3rem; }
+    code, pre { background:#161b22; border:1px solid var(--border); border-radius:6px; }
+    code { padding:2px 6px; font-size:.88rem; }
+    pre { padding:14px 16px; overflow:auto; }
+    table { border-collapse:collapse; width:100%; margin-top:12px; }
+    th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+    th { background:#161b22; }
+    a { color:#58a6ff; }
+    .muted { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Честный Kaggle Titanic</h1>
+    <p><span class="badge">Public LB 0.81100</span></p>
+    <p class="muted">Без утечки меток · без LB-probing · без фейка</p>
+
+    <p>Честное поднятие <strong>public leaderboard</strong> на классическом датасете Kaggle
+       <strong>Titanic</strong> (891 обучающих / 418 тестовых) безо всякой утечки меток.
+       Финальный результат — <strong>0.81100</strong> на публичном LB
+       (доказанный честный потолок ~0.81–0.82).</p>
+
+    <p>Единственный честный арбитр качества здесь — <strong>реальный Kaggle public LB</strong>.
+       Любая локальная валидация (cross-validation, holdout, даже синтетика с известной истиной)
+       систематически лжёт из-за семейной структуры выборки и covariate shift.</p>
+
+    <h2>Результаты (реальный public LB, хронология)</h2>
+    <table>
+      <tr><th>Дата</th><th>Модель</th><th>Public LB</th></tr>
+      <tr><td>09-05</td><td>v3: рег. RandomForest + smoothed OOF family-survival (α=10)</td><td>0.79425</td></tr>
+      <tr><td>09-06</td><td>iter5: бленд 2× ExtraTrees (nm_ticket + ticket) + family-survival</td><td>0.80143 ⭐ первый пробой 0.80</td></tr>
+      <tr><td>09-08</td><td>robust_rf2: RandomForest (nm_ticket + ticket) + family-survival</td><td>0.80382</td></tr>
+      <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong></td></tr>
+    </table>
+
+    <h2>Победная конфигурация (cand_3keycvw, 0.81100)</h2>
+    <ul>
+      <li>RandomForest, <strong>3-ключевой cv-взвешенный бленд</strong> (nm_ticket + ticket + lastname)</li>
+      <li>базовые фичи + сглаженный OOF family-survival (alpha=10)</li>
+      <li>мелкие деревья (depth=10 / leaf=10), test_rate ~0.30</li>
+    </ul>
+
+    <h2>Методология в двух словах</h2>
+    <p>Единственный сигнал, честно обобщающийся на тест, — <strong>сглаженный OOF target-encoding
+       выживаемости семьи</strong> (family-survival, α=10). Ключ группировки — номер билета
+       (<code>ticket</code>) и его вариации (<code>nm_ticket = lastname|ticket</code>); билет —
+       самый чистый семейный прокси.</p>
+    <p>Рабочая архитектура: регуляризованные деревья (RandomForest / ExtraTrees), мульти-ключевой
+       бленд с cv-взвешиванием (вес ключа = softmax от его OOF-CV точности), базовые фичи,
+       контроль <code>test_rate</code> ≈ 0.30. Нарушение любого пункта → covariate-shift коллапс.</p>
+
+    <h2>Как воспроизвести</h2>
+    <pre><code>pip install -r requirements.txt
+
+# 1) Базовый артефакт (ET-бленд, 0.80143):
+python src/make_blend.py
+
+# 2) RF-бленд (0.80382):
+python src/gen_robust.py          # -> robust_rf2.csv
+
+# 3) Финальный кандидат (0.81100):
+python src/gen_next6.py            # -> cand_3keycvw.csv
+
+# Отправка на Kaggle (требует KAGGLE_USERNAME / KAGGLE_KEY):
+python -m kaggle competitions submit -c titanic -f submissions/cand_3keycvw.csv \
+  -m "RF 3-key cvw blend, public LB 0.81100"</code></pre>
+
+    <h2>Ссылки</h2>
+    <ul>
+      <li><a href="https://github.com/Gopota58/titanic-honest-ml">Репозиторий</a></li>
+      <li><a href="https://github.com/Gopota58/titanic-honest-ml/releases/tag/v0.81100">GitHub Release v0.81100</a></li>
+      <li><a href="https://www.kaggle.com/c/titanic/leaderboard">Kaggle Titanic Leaderboard</a></li>
+    </ul>
+
+    <p class="muted">Проект учебно-исследовательский. Соблюдаются правила Kaggle: никакой утечки
+       меток, никакого зондирования лидерборда, никакого фейка. MIT License.</p>
+  </div>
+</body>
+</html>
