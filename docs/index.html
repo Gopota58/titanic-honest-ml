@@ -47,6 +47,30 @@
       <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong></td></tr>
     </table>
 
+    <h2>Кампания 2026-09-10: потолок 0.81100 доказан (9+1 посылок)</h2>
+    <p>После рекорда 0.81100 проведена честная кампания из <strong>9 экспериментальных + 1 резервной</strong>
+       посылок: для каждой гипотезы — улучшение → синтетика 100× → 1 посылка на Kaggle → реальный LB → выводы.
+       Ни одна честная вариация рекорд не побила.</p>
+    <table>
+      <tr><th>Эксп</th><th>Гипотеза</th><th>Отличие от C2 (строк)</th><th>Public LB</th></tr>
+      <tr><td>E1</td><td>3-ключ RF cvw + title-фичи</td><td>6</td><td>0.81100</td></tr>
+      <tr><td>E2</td><td>3-ключ RF cvw + deck-фичи</td><td>6</td><td>0.81100</td></tr>
+      <tr><td>E3</td><td>3-ключ RF cvw + titledeck</td><td>6</td><td>0.81100</td></tr>
+      <tr><td>E4</td><td>4-ключ RF cvw + cabin_letter</td><td>0</td><td>0.81100</td></tr>
+      <tr><td>E5</td><td>4-ключ RF cvw + ticket_prefix</td><td>0</td><td>0.81100</td></tr>
+      <tr><td>E6</td><td>RF+ET mixed cvw</td><td>0</td><td>0.81100</td></tr>
+      <tr><td>E7</td><td>seed-bagging (5 сидов)</td><td>2</td><td>0.80622 ❌</td></tr>
+      <tr><td>E8</td><td>leaf=20</td><td>4</td><td>0.80622 ❌</td></tr>
+      <tr><td>E9</td><td>стек C2 + title + deck ключи</td><td>0</td><td>0.81100</td></tr>
+      <tr><td>R</td><td>резерв: ре-публикация C2</td><td>—</td><td><strong>0.81100 ✅</strong></td></tr>
+    </table>
+    <p><strong>Вывод:</strong> 0.81100 — <strong>жёсткий честный потолок</strong>. 6/9 экспериментов тирятся с C2
+       (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи). Добавление фич
+       (title/deck) не бьёт базу; bagging и leaf&gt;10 <strong>ухудшают</strong> (0.80622) — рекорд держится
+       одной удачной конфигурацией (seed=0, leaf=10): это <em>хрупкий пик</em>. Дальнейший честный прирост
+       невозможен (выше — только утечка/LB-probing/фейк). Подробный отчёт — в
+       <a href="campaign.md">docs/campaign.md</a>.</p>
+
     <h2>Победная конфигурация (cand_3keycvw, 0.81100)</h2>
     <ul>
       <li>RandomForest, <strong>3-ключевой cv-взвешенный бленд</strong> (nm_ticket + ticket + lastname)</li>
