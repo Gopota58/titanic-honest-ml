@@ -45,6 +45,7 @@
       <tr><td>09-06</td><td>iter5: бленд 2× ExtraTrees (nm_ticket + ticket) + family-survival</td><td>0.80143 ⭐ первый пробой 0.80</td></tr>
       <tr><td>09-08</td><td>robust_rf2: RandomForest (nm_ticket + ticket) + family-survival</td><td>0.80382</td></tr>
       <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong></td></tr>
+      <tr><td>09-10 / 09-11</td><td>Кампании 9+1 и OOF-stacking зонды (доказательство потолка)</td><td>≤0.81100 (лучший 0.81100, зонды ≤0.80622)</td></tr>
     </table>
 
     <h2>Кампания 2026-09-10: потолок 0.81100 доказан (9+1 посылок)</h2>
@@ -71,6 +72,27 @@
        невозможен (выше — только утечка/LB-probing/фейк). Подробный отчёт — в
        <a href="campaign.md">docs/campaign.md</a>.</p>
 
+    <h2>Кампания 2026-09-11: OOF-stacking зонды (окончательное подтверждение)</h2>
+    <p>Закрыто <strong>последнее</strong> не опробованное честное направление — <strong>аккуратный OOF-stacking</strong>:
+       мета-модель (LogReg / RF / ET) на out-of-fold вероятностях 3–5 семейных ключей + base-фичи
+       (без утечки меток теста). 9 зондов + финальный резерв C2.</p>
+    <table>
+      <tr><th>Зонд</th><th>мета / ключи</th><th>diff vs C2</th><th>Public LB</th></tr>
+      <tr><td>S1</td><td>LogReg / 3 ключа C2</td><td>4</td><td>0.80622</td></tr>
+      <tr><td>S2</td><td>RF / 3 ключа C2</td><td>10</td><td>0.79665 ❌</td></tr>
+      <tr><td>S3</td><td>ET / 3 ключа C2</td><td>2</td><td>0.80622</td></tr>
+      <tr><td>S4</td><td>LogReg / +cabin_letter (4k)</td><td>4</td><td>0.80622</td></tr>
+      <tr><td>S5</td><td>RF / ticket+cabin (без lastname)</td><td>12</td><td>0.79665 ❌</td></tr>
+      <tr><td>S6</td><td>LogReg / +ticket_prefix (4k)</td><td>4</td><td>0.80622</td></tr>
+      <tr><td>S7</td><td>RF / 3k без base-фич</td><td>12</td><td>0.80143</td></tr>
+      <tr><td>S9</td><td>LogReg / 5 ключей + cvw-признак</td><td>4</td><td>0.80622</td></tr>
+      <tr><td>R</td><td>резерв: ре-публикация C2</td><td>—</td><td><strong>0.81100 ✅</strong></td></tr>
+    </table>
+    <p><strong>Вывод:</strong> OOF-stacking не пробил 0.81100 (лучшие зонды тирьяются на 0.80622 — уровень
+       title/deck из 2026-09-08). Даже 5-ключевой стек с cvw-признаком не сдвинул потолок. Исчерпаны
+       <strong>все</strong> честные оси улучшения — 0.81100 есть <strong>жёсткий информационный потолок</strong>
+       методологии на выборке 891/418.</p>
+
     <h2>Победная конфигурация (cand_3keycvw, 0.81100)</h2>
     <ul>
       <li>RandomForest, <strong>3-ключевой cv-взвешенный бленд</strong> (nm_ticket + ticket + lastname)</li>
@@ -96,8 +118,8 @@ python src/make_blend.py
 # 2) RF-бленд (0.80382):
 python src/gen_robust.py          # -> robust_rf2.csv
 
-# 3) Финальный кандидат (0.81100):
-python src/gen_next6.py            # -> cand_3keycvw.csv
+# 3) Финальный кандидат (0.81100, воспроизводимо diff=0):
+python examples/c2_minimal.py       # -> cand_3keycvw.csv
 
 # Отправка на Kaggle (требует KAGGLE_USERNAME / KAGGLE_KEY):
 python -m kaggle competitions submit -c titanic -f submissions/cand_3keycvw.csv \
