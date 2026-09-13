@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Честный Kaggle Titanic — public LB 0.81100</title>
+  <title>Честный Kaggle Titanic — public LB 0.81578</title>
   <style>
     :root { --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e; --accent:#2ea043; --border:#30363d; }
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-           background:var(--bg); color:var(--fg); line-height:1.6; }
+            background:var(--bg); color:var(--fg); line-height:1.6; }
     .wrap { max-width:880px; margin:0 auto; padding:48px 24px 72px; }
     h1 { font-size:2rem; margin:0 0 8px; }
     .badge { display:inline-block; background:var(--accent); color:#fff; font-weight:600;
-             padding:4px 12px; border-radius:999px; font-size:.9rem; }
+              padding:4px 12px; border-radius:999px; font-size:.9rem; }
     h2 { margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:6px; font-size:1.3rem; }
     code, pre { background:#161b22; border:1px solid var(--border); border-radius:6px; }
     code { padding:2px 6px; font-size:.88rem; }
@@ -26,13 +26,13 @@
 <body>
   <div class="wrap">
     <h1>Честный Kaggle Titanic</h1>
-    <p><span class="badge">Public LB 0.81100</span></p>
+    <p><span class="badge">Public LB 0.81578</span></p>
     <p class="muted">Без утечки меток · без LB-probing · без фейка</p>
 
     <p>Честное поднятие <strong>public leaderboard</strong> на классическом датасете Kaggle
        <strong>Titanic</strong> (891 обучающих / 418 тестовых) безо всякой утечки меток.
-       Финальный результат — <strong>0.81100</strong> на публичном LB
-       (доказанный честный потолок ~0.81–0.82).</p>
+       Финальный результат — <strong>0.81578</strong> на публичном LB
+       (честный рекорд; ранее считавшийся «жёстким потолком» 0.81100 пал 2026-09-13).</p>
 
     <p>Единственный честный арбитр качества здесь — <strong>реальный Kaggle public LB</strong>.
        Любая локальная валидация (cross-validation, holdout, даже синтетика с известной истиной)
@@ -44,14 +44,15 @@
       <tr><td>09-05</td><td>v3: рег. RandomForest + smoothed OOF family-survival (α=10)</td><td>0.79425</td></tr>
       <tr><td>09-06</td><td>iter5: бленд 2× ExtraTrees (nm_ticket + ticket) + family-survival</td><td>0.80143 ⭐ первый пробой 0.80</td></tr>
       <tr><td>09-08</td><td>robust_rf2: RandomForest (nm_ticket + ticket) + family-survival</td><td>0.80382</td></tr>
-      <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong></td></tr>
-      <tr><td>09-10 / 09-11</td><td>Кампании 9+1 и OOF-stacking зонды (доказательство потолка)</td><td>≤0.81100 (лучший 0.81100, зонды ≤0.80622)</td></tr>
+      <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong> (казался потолком)</td></tr>
+      <tr><td>09-10 / 09-11</td><td>Кампании 9+1 и OOF-stacking зонды</td><td>≤0.81100 (лучший 0.81100, зонды ≤0.80622)</td></tr>
+      <tr><td>09-13</td><td><strong>att_N3_ageimp: RF 3-ключевой cvw + доимпутация Age (Title×Pclass)</strong></td><td><strong>0.81578 🏆 НОВЫЙ рекорд</strong></td></tr>
     </table>
 
-    <h2>Кампания 2026-09-10: потолок 0.81100 доказан (9+1 посылок)</h2>
+    <h2>Кампания 2026-09-10/11: потолок 0.81100 доказан (9+1 + OOF-stacking)</h2>
     <p>После рекорда 0.81100 проведена честная кампания из <strong>9 экспериментальных + 1 резервной</strong>
        посылок: для каждой гипотезы — улучшение → синтетика 100× → 1 посылка на Kaggle → реальный LB → выводы.
-       Ни одна честная вариация рекорд не побила.</p>
+       Ни одна честная вариация <em>гиперпараметров/ключей/взвешивания/стекинга</em> рекорд не побила.</p>
     <table>
       <tr><th>Эксп</th><th>Гипотеза</th><th>Отличие от C2 (строк)</th><th>Public LB</th></tr>
       <tr><td>E1</td><td>3-ключ RF cvw + title-фичи</td><td>6</td><td>0.81100</td></tr>
@@ -65,38 +66,31 @@
       <tr><td>E9</td><td>стек C2 + title + deck ключи</td><td>0</td><td>0.81100</td></tr>
       <tr><td>R</td><td>резерв: ре-публикация C2</td><td>—</td><td><strong>0.81100 ✅</strong></td></tr>
     </table>
-    <p><strong>Вывод:</strong> 0.81100 — <strong>жёсткий честный потолок</strong>. 6/9 экспериментов тирятся с C2
-       (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи). Добавление фич
-       (title/deck) не бьёт базу; bagging и leaf&gt;10 <strong>ухудшают</strong> (0.80622) — рекорд держится
-       одной удачной конфигурацией (seed=0, leaf=10): это <em>хрупкий пик</em>. Дальнейший честный прирост
-       невозможен (выше — только утечка/LB-probing/фейк). Подробный отчёт — в
-       <a href="campaign.md">docs/campaign.md</a>.</p>
+    <p><strong>Вывод (для осей гиперпараметров/ключей/взвешивания/стекинга):</strong> 0.81100 — жёсткий потолок.
+       6/9 экспериментов тирятся с C2 (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи).
+       Добавление фич (title/deck) не бьёт базу; bagging и leaf&gt;10 <strong>ухудшают</strong> (0.80622).
+       OOF-stacking (S1–S9) также не пробил (лучшие 0.80622). См. <a href="campaign.md">docs/campaign.md</a>.</p>
 
-    <h2>Кампания 2026-09-11: OOF-stacking зонды (окончательное подтверждение)</h2>
-    <p>Закрыто <strong>последнее</strong> не опробованное честное направление — <strong>аккуратный OOF-stacking</strong>:
-       мета-модель (LogReg / RF / ET) на out-of-fold вероятностях 3–5 семейных ключей + base-фичи
-       (без утечки меток теста). 9 зондов + финальный резерв C2.</p>
+    <h2>Кампания 2026-09-13: потолок побит (0.81578) — инженерия фичей</h2>
+    <p>Движок C2 воспроизведён, но базовая фича <strong>Age</strong> вместо грубой глобальной медианы
+       заполнена <strong>медианой по группе Title×Pclass</strong> (честно, только по train). Кандидат
+       <code>att_N3_ageimp.csv</code> отличается от C2 ровно на 2 строки и дал на реальном LB
+       <strong>0.81578</strong> — потолок 0.81100 пал честной инженерией фичей.</p>
     <table>
-      <tr><th>Зонд</th><th>мета / ключи</th><th>diff vs C2</th><th>Public LB</th></tr>
-      <tr><td>S1</td><td>LogReg / 3 ключа C2</td><td>4</td><td>0.80622</td></tr>
-      <tr><td>S2</td><td>RF / 3 ключа C2</td><td>10</td><td>0.79665 ❌</td></tr>
-      <tr><td>S3</td><td>ET / 3 ключа C2</td><td>2</td><td>0.80622</td></tr>
-      <tr><td>S4</td><td>LogReg / +cabin_letter (4k)</td><td>4</td><td>0.80622</td></tr>
-      <tr><td>S5</td><td>RF / ticket+cabin (без lastname)</td><td>12</td><td>0.79665 ❌</td></tr>
-      <tr><td>S6</td><td>LogReg / +ticket_prefix (4k)</td><td>4</td><td>0.80622</td></tr>
-      <tr><td>S7</td><td>RF / 3k без base-фич</td><td>12</td><td>0.80143</td></tr>
-      <tr><td>S9</td><td>LogReg / 5 ключей + cvw-признак</td><td>4</td><td>0.80622</td></tr>
-      <tr><td>R</td><td>резерв: ре-публикация C2</td><td>—</td><td><strong>0.81100 ✅</strong></td></tr>
+      <tr><th>Кандидат</th><th>Ось</th><th>diff vs C2</th><th>Public LB</th></tr>
+      <tr><td>N1</td><td>4-ключ cvw + cabin_full (точная каюта как группа семьи)</td><td>0 (не посылали)</td><td>—</td></tr>
+      <tr><td>N2</td><td>4-ключ cvw + ticket_num (числовая часть билета)</td><td>0 (не посылали)</td><td>—</td></tr>
+      <tr><td><strong>N3</strong></td><td>3 ключа C2 + <strong>Age импутирован медианой Title×Pclass</strong></td><td><strong>2</strong></td><td><strong>0.81578 🏆</strong></td></tr>
     </table>
-    <p><strong>Вывод:</strong> OOF-stacking не пробил 0.81100 (лучшие зонды тирьяются на 0.80622 — уровень
-       title/deck из 2026-09-08). Даже 5-ключевой стек с cvw-признаком не сдвинул потолок. Исчерпаны
-       <strong>все</strong> честные оси улучшения — 0.81100 есть <strong>жёсткий информационный потолок</strong>
-       методологии на выборке 891/418.</p>
+    <p><strong>Урок:</strong> перебор гиперпараметров/ключей НЕ эквивалентен перебору базовой инженерии фичей.
+       «Доказанный потолок» держался лишь для нетронутых осей — базовая подготовка данных (импутация)
+       оказалась отдельной, ранее не тронутой осью роста. Локальная валидация (OOF-CV N3 = OOF-CV C2)
+       не предсказала победу — арбитр только реальный LB.</p>
 
-    <h2>Победная конфигурация (cand_3keycvw, 0.81100)</h2>
+    <h2>Победная конфигурация (att_N3_ageimp, 0.81578)</h2>
     <ul>
       <li>RandomForest, <strong>3-ключевой cv-взвешенный бленд</strong> (nm_ticket + ticket + lastname)</li>
-      <li>базовые фичи + сглаженный OOF family-survival (alpha=10)</li>
+      <li>базовые фичи + <strong>Age, импутированная медианой по Title×Pclass</strong> + сглаженный OOF family-survival (alpha=10)</li>
       <li>мелкие деревья (depth=10 / leaf=10), test_rate ~0.30</li>
     </ul>
 
@@ -119,16 +113,19 @@ python src/make_blend.py
 python src/gen_robust.py          # -> robust_rf2.csv
 
 # 3) Финальный кандидат (0.81100, воспроизводимо diff=0):
-python examples/c2_minimal.py       # -> cand_3keycvw.csv
+python examples/c2_minimal.py       # -> submissions/c2_minimal.csv
+
+# 4) НОВЫЙ рекорд 0.81578 — доимпутация Age (воспроизводимо diff=0):
+python examples/n3_ageimp.py        # -> submissions/n3_ageimp.csv
 
 # Отправка на Kaggle (требует KAGGLE_USERNAME / KAGGLE_KEY):
-python -m kaggle competitions submit -c titanic -f submissions/cand_3keycvw.csv \
-  -m "RF 3-key cvw blend, public LB 0.81100"</code></pre>
+python -m kaggle competitions submit -c titanic -f submissions/att_N3_ageimp.csv \
+  -m "RF 3-key cvw blend + Age imputed by Title x Pclass, public LB 0.81578"</code></pre>
 
     <h2>Ссылки</h2>
     <ul>
       <li><a href="https://github.com/Gopota58/titanic-honest-ml">Репозиторий</a></li>
-      <li><a href="https://github.com/Gopota58/titanic-honest-ml/releases/tag/v0.81100">GitHub Release v0.81100</a></li>
+      <li><a href="https://github.com/Gopota58/titanic-honest-ml/releases/tag/v0.81578">GitHub Release v0.81578</a></li>
       <li><a href="https://www.kaggle.com/c/titanic/leaderboard">Kaggle Titanic Leaderboard</a></li>
     </ul>
 
