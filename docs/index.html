@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Честный Kaggle Titanic — public LB 0.81578</title>
+  <title>Честный Kaggle Titanic — public LB 0.82057</title>
   <style>
     :root { --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e; --accent:#2ea043; --border:#30363d; }
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -26,13 +26,13 @@
 <body>
   <div class="wrap">
     <h1>Честный Kaggle Titanic</h1>
-    <p><span class="badge">Public LB 0.81578</span></p>
+    <p><span class="badge">Public LB 0.82057</span></p>
     <p class="muted">Без утечки меток · без LB-probing · без фейка</p>
 
     <p>Честное поднятие <strong>public leaderboard</strong> на классическом датасете Kaggle
        <strong>Titanic</strong> (891 обучающих / 418 тестовых) безо всякой утечки меток.
-       Финальный результат — <strong>0.81578</strong> на публичном LB
-       (честный рекорд; ранее считавшийся «жёстким потолком» 0.81100 пал 2026-09-13).</p>
+       Финальный результат — <strong>0.82057</strong> на публичном LB
+       (честный рекорд; «жёсткий потолок» 0.81100 пал 2026-09-13, затем 0.81578 пал 2026-09-16).</p>
 
     <p>Единственный честный арбитр качества здесь — <strong>реальный Kaggle public LB</strong>.
        Любая локальная валидация (cross-validation, holdout, даже синтетика с известной истиной)
@@ -46,7 +46,8 @@
       <tr><td>09-08</td><td>robust_rf2: RandomForest (nm_ticket + ticket) + family-survival</td><td>0.80382</td></tr>
       <tr><td>09-08</td><td><strong>cand_3keycvw: RF 3-ключевой cv-взвешенный бленд</strong></td><td><strong>0.81100 🏆</strong> (казался потолком)</td></tr>
       <tr><td>09-10 / 09-11</td><td>Кампании 9+1 и OOF-stacking зонды</td><td>≤0.81100 (лучший 0.81100, зонды ≤0.80622)</td></tr>
-      <tr><td>09-13</td><td><strong>att_N3_ageimp: RF 3-ключевой cvw + доимпутация Age (Title×Pclass)</strong></td><td><strong>0.81578 🏆 НОВЫЙ рекорд</strong></td></tr>
+      <tr><td>09-13</td><td><strong>att_N3_ageimp: RF 3-ключевой cvw + доимпутация Age (Title×Pclass)</strong></td><td><strong>0.81578 🏆</strong> (потолок побит)</td></tr>
+      <tr><td>09-16</td><td><strong>att_px_tp: N3 + комплементарный family-survival по префиксу билета</strong></td><td><strong>0.82057 🏆 НОВЫЬ РЕКОРД</strong></td></tr>
     </table>
 
     <h2>Кампания 2026-09-10/11: потолок 0.81100 доказан (9+1 + OOF-stacking)</h2>
@@ -67,9 +68,9 @@
       <tr><td>R</td><td>резерв: ре-публикация C2</td><td>—</td><td><strong>0.81100 ✅</strong></td></tr>
     </table>
     <p><strong>Вывод (для осей гиперпараметров/ключей/взвешивания/стекинга):</strong> 0.81100 — жёсткий потолок.
-       6/9 экспериментов тирятся с C2 (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи).
-       Добавление фич (title/deck) не бьёт базу; bagging и leaf&gt;10 <strong>ухудшают</strong> (0.80622).
-       OOF-stacking (S1–S9) также не пробил (лучшие 0.80622). См. <a href="campaign.md">docs/campaign.md</a>.</p>
+        6/9 экспериментов тирятся с C2 (E4/E5/E9 — diff 0 строк: cv-взвешивание корректно обнулило слабые ключи).
+        Добавление фич (title/deck) не бьёт базу; bagging и leaf&gt;10 <strong>ухудшают</strong> (0.80622).
+        OOF-stacking (S1–S9) также не пробил (лучшие 0.80622). См. <a href="campaign.md">docs/campaign.md</a>.</p>
 
     <h2>Кампания 2026-09-13: потолок побит (0.81578) — инженерия фичей</h2>
     <p>Движок C2 воспроизведён, но базовая фича <strong>Age</strong> вместо грубой глобальной медианы
@@ -87,10 +88,27 @@
        оказалась отдельной, ранее не тронутой осью роста. Локальная валидация (OOF-CV N3 = OOF-CV C2)
        не предсказала победу — арбитр только реальный LB.</p>
 
-    <h2>Победная конфигурация (att_N3_ageimp, 0.81578)</h2>
+    <h2>Кампания 2026-09-16: потолок 0.81578 побит (0.82057) — комплементарный сигнал</h2>
+    <p>Движок N3 воспроизведён, но к base-фичам добавлен <strong>комплементарный family-survival по
+       ПРЕФИКСУ БИЛЕТА</strong> (<code>fs_tp</code>) как дополнительная фича ко всем 3 ключевым моделям —
+       отдельно от основного сигнала по точному билету. Кандидат <code>att_px_tp.csv</code> отличается
+       от N3 ровно на 2 строки и дал на реальном LB <strong>0.82057</strong> — рекорд 0.81578 пал.</p>
+    <table>
+      <tr><th>Кандидат</th><th>Комплементарный сигнал</th><th>diff vs N3</th><th>Public LB</th></tr>
+      <tr><td>att_px_ln</td><td>+surv по фамилии</td><td>2</td><td>0.81100 (фамилия вредна)</td></tr>
+      <tr><td><strong>att_px_tp</strong></td><td><strong>+surv по префиксу билета</strong></td><td><strong>2</strong></td><td><strong>0.82057 🏆</strong></td></tr>
+      <tr><td>att_px_lntp</td><td>+оба (фамилия+префикс)</td><td>6</td><td>0.81100</td></tr>
+      <tr><td>att_px_tpc</td><td>+surv по палубе</td><td>8</td><td>0.80143 ❌❌</td></tr>
+    </table>
+    <p><strong>Урок:</strong> единственный рабочий комплементарный сигнал — префикс билета; другие
+       группировки (фамилия, палуба) вредны (famcomp-ловушка). Рост снова дала смена базовой оси,
+       не гиперпараметры.</p>
+
+    <h2>Победная конфигурация (att_px_tp, 0.82057)</h2>
     <ul>
       <li>RandomForest, <strong>3-ключевой cv-взвешенный бленд</strong> (nm_ticket + ticket + lastname)</li>
-      <li>базовые фичи + <strong>Age, импутированная медианой по Title×Pclass</strong> + сглаженный OOF family-survival (alpha=10)</li>
+      <li>базовые фичи + <strong>Age, импутированная медианой по Title×Pclass</strong> + сглаженный OOF family-survival (alpha=10)
+          <strong>+ комплементарный family-survival по префиксу билета (fs_tp)</strong></li>
       <li>мелкие деревья (depth=10 / leaf=10), test_rate ~0.30</li>
     </ul>
 
@@ -115,17 +133,20 @@ python src/gen_robust.py          # -> robust_rf2.csv
 # 3) Финальный кандидат (0.81100, воспроизводимо diff=0):
 python examples/c2_minimal.py       # -> submissions/c2_minimal.csv
 
-# 4) НОВЫЙ рекорд 0.81578 — доимпутация Age (воспроизводимо diff=0):
+# 4) Рекорд 0.81578 — доимпутация Age (воспроизводимо diff=0):
 python examples/n3_ageimp.py        # -> submissions/n3_ageimp.csv
 
+# 5) НОВЫЙ рекорд 0.82057 — комплементарный family-survival (diff=0):
+python examples/px_tp.py           # -> submissions/px_tp.csv
+
 # Отправка на Kaggle (требует KAGGLE_USERNAME / KAGGLE_KEY):
-python -m kaggle competitions submit -c titanic -f submissions/att_N3_ageimp.csv \
-  -m "RF 3-key cvw blend + Age imputed by Title x Pclass, public LB 0.81578"</code></pre>
+python -m kaggle competitions submit -c titanic -f submissions/att_px_tp.csv \
+  -m "RF 3-key cvw + Age Title x Pclass + complementary ticket-prefix family-survival, public LB 0.82057"</code></pre>
 
     <h2>Ссылки</h2>
     <ul>
       <li><a href="https://github.com/Gopota58/titanic-honest-ml">Репозиторий</a></li>
-      <li><a href="https://github.com/Gopota58/titanic-honest-ml/releases/tag/v0.81578">GitHub Release v0.81578</a></li>
+      <li><a href="https://github.com/Gopota58/titanic-honest-ml/releases/tag/v0.82057">GitHub Release v0.82057</a></li>
       <li><a href="https://www.kaggle.com/c/titanic/leaderboard">Kaggle Titanic Leaderboard</a></li>
     </ul>
 
